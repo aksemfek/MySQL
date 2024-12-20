@@ -23,7 +23,7 @@ public class MemberRepository {
     static final private String TABLE = "member";
 
     public Optional<Member> findById(Long id) {
-        var sql = String.format( "SELECT * FROM %s WHERE id = :id", TABLE);
+        var sql = String.format("SELECT * FROM %s WHERE id = :id", TABLE);
         var param = new MapSqlParameterSource()
                 .addValue("id", id);
 
@@ -63,6 +63,10 @@ public class MemberRepository {
     }
 
     private Member update(Member member) {
+        var sql = String.format("UPDATE %s SET email = :email, nickname = :nickname, birthday = :birthday WHERE id = :id", TABLE);
+        SqlParameterSource params = new BeanPropertySqlParameterSource(member);
+        namedParameterJdbcTemplate.update(sql, params);
+
         return member;
     }
 }
