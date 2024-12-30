@@ -20,8 +20,8 @@ public class PostBulkInsertTest {
     @Test
     public void bulkinInsert() {
         var easyRandom = PostFixtureFactory.get(
-                3L,
-                LocalDate.of(2022, 1, 1),
+                4L,
+                LocalDate.of(2000, 1, 1),
                 LocalDate.of(2022, 2, 1)
         );
 

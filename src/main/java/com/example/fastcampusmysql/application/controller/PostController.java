@@ -8,6 +8,9 @@ import com.example.fastcampusmysql.domain.post.repository.PostRepository;
 import com.example.fastcampusmysql.domain.post.service.PostReadService;
 import com.example.fastcampusmysql.domain.post.service.PostWriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,5 +33,10 @@ public class PostController {
     @GetMapping("/daily-post-counts")
     public List<DailyPostCount> getDailyPostCounts(DailyPostCountRequest request) {
         return postReadService.getDailyPostCounts(request);
+    }
+
+    @GetMapping("/members/{memberId}")
+    public Page<Post> getPosts(@PathVariable Long memberId, Pageable pageable ) {
+        return postReadService.getPosts(memberId, pageable);
     }
 }

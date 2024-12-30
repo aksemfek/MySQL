@@ -44,6 +44,7 @@ create table POST
         primary key (id)
 );
 
+
 create index POST__index_member_id
     on POST (memberId);
 
