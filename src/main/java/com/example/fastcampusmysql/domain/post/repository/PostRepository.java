@@ -1,15 +1,13 @@
 package com.example.fastcampusmysql.domain.post.repository;
 
-import com.example.fastcampusmysql.domain.PageHelper;
+import com.example.fastcampusmysql.util.PageHelper;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCount;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCountRequest;
 import com.example.fastcampusmysql.domain.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -26,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Repository
 public class PostRepository {
-    static final String TABLE ="Post";
+    static final String TABLE = "Post";
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -44,15 +42,15 @@ public class PostRepository {
             resultSet.getLong("cnt")
     );
 
-    public List<DailyPostCount>  groupByCreatedDate(DailyPostCountRequest request) {
+    public List<DailyPostCount> groupByCreatedDate(DailyPostCountRequest request) {
         var sql = String.format("""
-                SELECT createdDate, memberId, count(id) as cnt
-                FROM %s
-                WHERE memberId = :memberId and createdDate between :firstDate and :lastDate
-                GROUP BY memberId, createdDate
-               """, TABLE);
+                 SELECT createdDate, memberId, count(id) as cnt
+                 FROM %s
+                 WHERE memberId = :memberId and createdDate between :firstDate and :lastDate
+                 GROUP BY memberId, createdDate
+                """, TABLE);
         var params = new BeanPropertySqlParameterSource(request);
-        return namedParameterJdbcTemplate.query(sql,params, DAILY_POST_COUNT_MAPPER);
+        return namedParameterJdbcTemplate.query(sql, params, DAILY_POST_COUNT_MAPPER);
     }
 
     public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
@@ -75,7 +73,7 @@ public class PostRepository {
         return new PageImpl(posts, pageable, getCount(memberId));
     }
 
-    private Long getCount(Long memberId){
+    private Long getCount(Long memberId) {
         var sql = String.format("""
                 select count(id)
                 FROM %s
@@ -86,8 +84,37 @@ public class PostRepository {
         return namedParameterJdbcTemplate.queryForObject(sql, params, Long.class);
     }
 
+    public List<Post> findAllByMemberIdAndOrderByIdDecs(Long memberId, int size) {
+        var sql = String.format("""
+                select *
+                FROM %s
+                Where memberId = :memberId
+                ORDER BY id desc
+                Limit :size
+                """, TABLE);
+        var params = new MapSqlParameterSource()
+                .addValue("memberId", memberId)
+                .addValue("size", size);
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Post> findAllByLessThanIdAndMemberIdAndOrderByIdDecs(Long id, Long memberId, int size) {
+        var sql = String.format("""
+                select *
+                FROM %s
+                Where memberId = :memberId and id < :id
+                Order by id desc
+                Limit :size
+                """, TABLE);
+        var params = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("memberId", memberId)
+                .addValue("size", size);
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
     public Post save(Post post) {
-        if(post.getId() == null) {
+        if (post.getId() == null) {
             return insert(post);
         }
         throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다.");
