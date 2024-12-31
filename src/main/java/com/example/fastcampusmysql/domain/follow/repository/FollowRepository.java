@@ -23,7 +23,7 @@ public class FollowRepository {
 
     private final RowMapper<Follow> ROW_MAPPER = (ResultSet resultSet, int rowNUm) -> Follow.builder()
             .id(resultSet.getLong("id"))
-            .fromMemberId(resultSet.getLong("formMemberId"))
+            .fromMemberId(resultSet.getLong("fromMemberId"))
             .toMemberId(resultSet.getLong("toMemberId"))
             .createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
             .build();
