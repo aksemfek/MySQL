@@ -29,7 +29,13 @@ public class FollowRepository {
             .build();
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public List<Follow> findAllByFromMemberId(Long fromMemberId) {
+    public List<Follow> findAllByFromMemberId(Long toMemberId) {
+        var sql = String.format("SELECT * FROM %s WHERE toMemberId = :toMemberId", TABLE);
+        var params = new MapSqlParameterSource().addValue("toMemberId", toMemberId);
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Follow> findAllByToMemberId(Long fromMemberId) {
         var sql = String.format("SELECT * FROM %s WHERE fromMemberId = :fromMemberId", TABLE);
         var params = new MapSqlParameterSource().addValue("fromMemberId", fromMemberId);
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
